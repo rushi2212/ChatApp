@@ -3,11 +3,23 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const path = require("path");
+
 dotenv.config();
-port=process.env.PORT || 5000;
-console.log(port)
+const port = process.env.PORT || 5000;
+console.log(port);
+
 const app = express();
 app.use(cors());
+
+// Serve static files from the frontend dist directory
+const frontendDistPath = path.join(__dirname, "dist"); // Adjust if needed
+app.use(express.static(frontendDistPath));
+
+// Serve index.html for all routes (SPA support)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendDistPath, "index.html"));
+});
 
 const server = http.createServer(app);
 const io = new Server(server, {
